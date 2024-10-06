@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 LOGS_FOLDER="/var/log/Expense/" #folder path Expense created  in  /var/log
 
 SCRIPT_NAME=$(echo $0 | cut -d "." -f1) #created scriptname with removing .sh here $0 redirctors which will give script name.
@@ -21,7 +20,7 @@ CHECK_ROOT() {
     if [ $USER_ID -ne 0 ]; then
         # here tee command will append the result in logfile before | (pipe) it will print on the terminal also
         #if your using tee command the no need of &>>
-        echo -e "$R please run the script with root privilages $N" | tee -a $LOG_FILE 
+        echo -e "$R please run the script with root privilages $N" | tee -a $LOG_FILE
         exit 1
     fi
 }
@@ -30,10 +29,9 @@ validate() {
     if [ $1 -ne 0 ]; then
         echo -e "$2 is $R not success.. Check it.$N" | tee -a $LOG_FILE
     else
-        echo -e "$2 is $G Sucessfull...$N"  | tee -a $LOG_FILE
+        echo -e "$2 is $G Sucessfull...$N" | tee -a $LOG_FILE
     fi
 }
-
 
 echo "Script started executing at: $(date)" | tee -a $LOG_FILE
 CHECK_ROOT
@@ -47,5 +45,12 @@ validate $? "enables mysql server.."
 systemctl start mysqld &>>$LOG_FILE
 validate $? "started mysql server.."
 
-mysql_secure_installation --set-root-pass ExpenseApp@1 &>>$LOG_FILE
-validate $? "setting up root password.."
+# mysql_secure_installation --set-root-pass ExpenseApp@1 &>>$LOG_FILE
+mysql -h mysqldb.basavadevops81s.online -u root -pExpenseApp@1 -e 'show databases;' &>>$LOG_FILE
+if [ $? -ne 0 ]; then
+    echo "MySQL root password is not setup, setting now" &>>$LOG_FILE
+    mysql_secure_installation --set-root-pass ExpenseApp@1
+    validate $? "setting up root password.."
+else
+    echo -e "MySQL root password is already setup...$Y SKIPPING $N" | tee -a $LOG_FILE
+fi
