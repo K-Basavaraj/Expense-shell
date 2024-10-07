@@ -75,7 +75,7 @@ else
 fi
 
 systemctl status mysqld | tee -a $LOG_FILE
-netstat -lntp mysqld  | tee -a $LOG_FILE
+netstat -lntp  | tee -a $LOG_FILE
 ps -ef | grep mysqld | tee -a $LOG_FILE
 
 
