@@ -50,16 +50,14 @@ CHECK_ROOT
 
 dnf list installed mysql-server &>>$LOG_FILE
 if [ $? -ne 0 ]; then
-    echo -e "$R mysql-server is not installed..going to install it..$N"
+    echo -e "$R mysql-server is not installed..going to install it..$N" &>>$LOG_FILE
     dnf install mysql-server -y &>>$LOG_FILE
     validate $? "Installing mysql-server" #here also i am calling validaing function again
 
     systemctl enable mysqld &>>$LOG_FILE
     enable_status=$?
-    #service $? "enables mysql server.."
     systemctl start mysqld &>>$LOG_FILE
     start_status=$?
-    #service $? "started" "mysql-server.."
     # Call the service function with the enable and start status
     service $enable_status "MySQL server" $start_status
 else
@@ -75,6 +73,10 @@ if [ $? -ne 0 ]; then
 else
     echo -e "MySQL root password is already setup...$Y SKIPPING $N" | tee -a $LOG_FILE
 fi
+
+systemctl status mysqld | tee -a $LOG_FILE
+netstat -lntp mysqld  | tee -a $LOG_FILE
+ps -ef | grep mysqld | tee -a $LOG_FILE
 
 
 : '
