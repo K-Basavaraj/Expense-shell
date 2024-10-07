@@ -33,17 +33,65 @@ validate() {
     fi
 }
 
+service(){
+    if [ $1 -ne 0 ]; then
+        echo -e "$2 is $R not enabled.. Check it.$N" | tee -a $LOG_FILE
+    else
+        echo -e "$2 is $G enabled...$N" | tee -a $LOG_FILE
+         # Now check if the service is started
+        if [ $3 -ne 0 ]; then
+            echo -e "$2 is $R not started.. Check it.$N"
+        else
+            echo -e "$2 is $G started...$N"
+        fi
+    fi
+}
+
 echo "Script started executing at: $(date)" | tee -a $LOG_FILE
 CHECK_ROOT
 
-dnf install mysql-server -y &>>$LOG_FILE
-validate $? "Installing mysql server.."
+# dnf install mysql-server -y &>>$LOG_FILE
+# validate $? "Installing mysql server.."
 
-systemctl enable mysqld &>>$LOG_FILE
-validate $? "enables mysql server.."
+# systemctl enable mysqld &>>$LOG_FILE
+# validate $? "enables mysql server.."
 
-systemctl start mysqld &>>$LOG_FILE
-validate $? "started mysql server.."
+# systemctl start mysqld &>>$LOG_FILE
+# validate $? "started mysql server.."
+
+# mysql_secure_installation --set-root-pass ExpenseApp@1 &>>$LOG_FILE
+# mysql -h mysqldb.basavadevops81s.online -u root -pExpenseApp@1 -e 'show databases;' &>>$LOG_FILE
+# if [ $? -ne 0 ]; then
+#     echo "MySQL root password is not setup, setting now" &>>$LOG_FILE
+#     mysql_secure_installation --set-root-pass ExpenseApp@1
+#     validate $? "setting up root password.."
+# else
+#     echo -e "MySQL root password is already setup...$Y SKIPPING $N" | tee -a $LOG_FILE
+# fi
+
+
+
+# Assignment
+# check MySQL Server is installed or not, enabled or not, started or not
+# implement the above things
+
+dnf list installed mysql-server &>>$LOG_FILE
+if [ $? -ne 0 ]; then
+    echo -e "$R mysql-server is not installed..going to install it..$N"
+    dnf install mysql-server -y &>>$LOG_FILE
+    validate $? "Installing mysql-server" #here also i am calling validaing function again
+
+    systemctl enable mysqld &>>$LOG_FILE
+    enable_status=$?
+    #service $? "enables mysql server.."
+    systemctl start mysqld &>>$LOG_FILE
+    start_status=$?
+    #service $? "started" "mysql-server.."
+    # Call the service function with the enable and start status
+    service $enable_status "MySQL server" $start_status
+else
+    echo -e "$G Mysqlserver is already installed nothing to do.."
+fi
 
 # mysql_secure_installation --set-root-pass ExpenseApp@1 &>>$LOG_FILE
 mysql -h mysqldb.basavadevops81s.online -u root -pExpenseApp@1 -e 'show databases;' &>>$LOG_FILE
@@ -54,7 +102,3 @@ if [ $? -ne 0 ]; then
 else
     echo -e "MySQL root password is already setup...$Y SKIPPING $N" | tee -a $LOG_FILE
 fi
-
-# Assignment
-# check MySQL Server is installed or not, enabled or not, started or not
-# implement the above things
