@@ -40,7 +40,7 @@ validate $? "enabled nodejs:20"
 dnf install nodejs -y &>> $LOG_FILE
 validate $? "insatllation nodejs"
 
-id expense
+id expense &>> $LOG_FILE
 if [ $? -ne 0 ]; then
     echo -e "expense user not exists... $G Creating $N" | tee -a $LOG_FILE
     useradd expense &>> $LOG_FILE
@@ -49,7 +49,7 @@ else
     echo -e "expense user already exists... $Y Skipping $N" | tee -a $LOG_FILE
 fi
 
-mkdir -p /app
+mkdir -p /app 
 validate $? "Creating /app folder"
 
 curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip &>> $LOG_FILE
@@ -64,7 +64,24 @@ validate $? "Extracting backend application code"
 npm install &>> $LOG_FILE
 pwd
 
+#download the dependencies.
+npm install &>> $LOG_FILE
 # We need to setup a new service in systemd so systemctl can manage this service [ already setup in service file diroctories ]
 #Setup SystemD Expense Backend Service
+cp /home/ec2-user/Expense-shell/servicefile/backend.service /etc/systemd/system/backend.service #absolute path and realtive path 
 
-# cp /home/ec2-user//etc/systemd/system/backend.service
+# load the data before running backend
+dnf install mysql -y &>> $LOG_FILE
+validate $? "Installing MySQL Client"
+
+mysql -h mysqldb.basavadevops81s.online -uroot -pExpenseApp@1 < /app/schema/backend.sql &>>$LOG_FILE
+validate $? "schema loading" 
+
+systemctl daemon-reload >> $LOG_FILE
+validate $? "Daemon reload"
+
+systemctl enable backend >>& $LOG_FILE
+validate $? "Enabled backend"
+
+systemctl restart backend &>>$LOG_FILE
+validate $? "Restarted Backend"
