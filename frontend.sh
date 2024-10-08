@@ -1,8 +1,8 @@
 #!/bin/bash
 R="\e[31m"
 G="\e[32m"
-Y="\[33m"
-N="\[0m"
+Y="\e[33m"
+N="\e[0m"
 
 LOGS_FOLDER="/var/log/Expense"
 SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
