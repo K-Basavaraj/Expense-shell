@@ -27,9 +27,9 @@ CHECK_ROOT() {
 
 validate() {
     if [ $1 -ne 0 ]; then
-        echo -e "$2 is $R not success.. Check it.$N" | tee -a $LOG_FILE
+        echo -e "$2 is $R FAILED.. Check it.$N" | tee -a $LOG_FILE
     else
-        echo -e "$2 is $G Sucessfull...$N" | tee -a $LOG_FILE
+        echo -e "$2 is $G SUCESSES...$N" | tee -a $LOG_FILE
     fi
 }
 
