@@ -7,7 +7,7 @@ N="\e[0m"
 # synatx: [ /var/log/<script_folder>/<script_name>-<timetamp>.log ]
 LOGS_FOLDER="/var/log/Expense/"
 SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
-TIMESTAMP=$(date %Y-%m-%d-%H-%M-%S)
+TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME-$TIMESTAMP.log"
 
 mkdir -p $LOGS_FOLDER
@@ -21,9 +21,9 @@ CHECK_ROOT() {
 
 validate() {
     if [ $1 -ne 0 ]; then
-        echo "$2 is $R FAILED..CHECK IT. $N" | tee -a $LOG_FILE
+        echo -e "$2 is $R FAILED..CHECK IT. $N" | tee -a $LOG_FILE
     else
-        echo "$2 is $G SUCESSES.. $N" | tee -a $LOG_FILE
+        echo -e "$2 is $G SUCESSES.. $N" | tee -a $LOG_FILE
     fi
 }
 
@@ -46,7 +46,7 @@ if [ $? -ne 0 ]; then
     useradd expense &>> $LOG_FILE
     validate $? "Creating expense user"
 else
-    echo -e "expense user already exists... $y Skipping $N" | tee -a $LOG_FILE
+    echo -e "expense user already exists... $Y Skipping $N" | tee -a $LOG_FILE
 fi
 
 mkdir -p /app
