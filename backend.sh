@@ -77,10 +77,10 @@ validate $? "Installing MySQL Client"
 mysql -h mysqldb.basavadevops81s.online -uroot -pExpenseApp@1 < /app/schema/backend.sql &>>$LOG_FILE
 validate $? "schema loading" 
 
-systemctl daemon-reload >> $LOG_FILE
+systemctl daemon-reload &>> $LOG_FILE
 validate $? "Daemon reload"
 
-systemctl enable backend >>& $LOG_FILE
+systemctl enable backend &>> $LOG_FILE
 validate $? "Enabled backend"
 
 systemctl restart backend &>>$LOG_FILE
